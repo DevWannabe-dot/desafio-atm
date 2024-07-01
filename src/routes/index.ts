@@ -12,11 +12,15 @@ router.post('/api/saque', (req, res) => {
     if(typeof valor !== 'number' || valor <= 0) return res.status(400).send({ error: 'Valor inválido inserido.' });
 
     const { resultado, observacao } = calcularSaque(valor);
+    const response = {
+        resultado,
+        observacao
+    };
 
-    if(observacao[0] != ''){
-        res.json({ observacao });
-    } else {
-        res.json({ resultado });
+    if(observacao[0 ] != "Ok."){
+        res.json(response);
+    } else {    
+        res.json(response.resultado);
     }
 });
 
@@ -24,7 +28,7 @@ function calcularSaque(valor: number)
 {
     const cedulas = [100, 50, 20, 10, 5, 2];
     const resultado: {[key: number]: number} = {};
-    const observacao: string[] = [];
+    const observacao: string[] = ["Ok."];
 
     for(const cedula of cedulas){
         resultado[cedula] = Math.floor(valor / cedula); // Procedimento de 'round' seguro para evitar passar do valor inserido
@@ -32,7 +36,8 @@ function calcularSaque(valor: number)
     }
 
     if(valor > 0){
-        observacao.push("Para completar o saque, insira:");
+        observacao.pop();   // Remover "Ok."
+        observacao.push(`Para completar o saque com os R$${valor} restante${valor > 1 ? 's' : ' '}, insira:`);
         observacao.push("- 2 notas de 2, para receber 1 de 5; ou");
         observacao.push("- 1 nota de 5, para receber 3 de 2.");
         observacao.push("Ou tente novamente com outro valor.");
